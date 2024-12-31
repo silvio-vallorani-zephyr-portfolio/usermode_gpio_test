@@ -1,0 +1,24 @@
+/*
+ * Copyright (c) 2024-2025 silvio.vallorani.dev@gmail.com
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+ / {
+	aliases {
+		dbg-pin0 = &dbg_pin0;
+		dbg-pin1 = &dbg_pin1;
+	};
+
+	dbg_pins: dbg_pins {
+		compatible = "debug-pins";
+		dbg_pin0: dbg_pin_0 {
+			gpios = <&gpioc 6 GPIO_ACTIVE_HIGH>;
+			label = "Debug PIn 0";
+		};
+		dbg_pin1: dbg_pin_1 {
+			gpios = <&gpioc 8 GPIO_ACTIVE_HIGH>;
+			label = "Debug PIn 1";
+		};
+	};
+};
