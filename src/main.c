@@ -12,8 +12,9 @@
 #include <zephyr/sys/printk.h>
 #include <zephyr/sys/libc-hooks.h>
 
-struct gpio_dt_spec dbg_pin0 = GPIO_DT_SPEC_GET(DT_ALIAS(dbg_pin0), gpios);
-struct gpio_dt_spec dbg_pin1 = GPIO_DT_SPEC_GET(DT_ALIAS(dbg_pin1), gpios);
+// get the GPIO device
+const struct gpio_dt_spec dbg_pin0 = GPIO_DT_SPEC_GET(DT_ALIAS(dbg_pin0), gpios);
+const struct gpio_dt_spec dbg_pin1 = GPIO_DT_SPEC_GET(DT_ALIAS(dbg_pin1), gpios);
 
 // Define the stack size and priority
 #define THREAD_USERMODE_STACK_SIZE 2048
@@ -40,10 +41,10 @@ int main(void)
 	// Create the usermode thread in user mode
 	usermode_thread = k_thread_create(&thread_usermode_data, thread_usermode_stack_area, THREAD_USERMODE_STACK_SIZE,
 					thread_usermode, NULL, NULL, NULL,
-					THREAD_USERMODE_PRIORITY, K_USER|K_INHERIT_PERMS, K_NO_WAIT);
+					THREAD_USERMODE_PRIORITY, K_USER, K_NO_WAIT);
 
 	// Grant access to the GPIO device to the user mode thread
-	k_object_access_grant(&dbg_pin1, usermode_thread);
+	k_object_access_grant(dbg_pin1.port, usermode_thread);
 
 	// Start the usermode thread
 	k_thread_start(usermode_thread);
@@ -62,9 +63,10 @@ void thread_usermode(void *dummy1, void *dummy2, void *dummy3)
 	__unused int ret;
 	
 	while(1) {
-		k_msleep(1000);
 		ret = gpio_pin_toggle_dt(&dbg_pin1);
+		k_msleep(1000);
 	}
 	
 	return;
 }
+
